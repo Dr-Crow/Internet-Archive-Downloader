@@ -1,0 +1,29 @@
+iad:
+  threads: 2
+  identifiers:
+    - "nasa"
+  file_extension_exclusion:
+    - ".xml"
+    - ".txt"
+    - ".sqlite"
+  download_path: "/nfs/Test_Download/"
+  max_retries: -1
+  ia_ini_path: "/home/ia.ini"
+  skip_duplicate_files: True
+  file_integrity_type: "md5"
+logging:
+    version: 1
+    disable_existing_loggers: False
+    formatters:
+      simpleFormater:
+          format: "%(asctime)s.%(msecs)03d %(levelname)s:%(threadName)s:%(message)s"
+          datefmt: "%Y-%m-%d %H:%M:%S"
+    handlers:
+      file:
+          class : logging.FileHandler
+          formatter: simpleFormater
+          level: DEBUG
+          filename: iad.log
+    root:
+      level: DEBUG
+      handlers: [file]
