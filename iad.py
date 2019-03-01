@@ -9,7 +9,6 @@ import os
 import time
 import hashlib
 import sys
-import pprint
 import copy
 
 # Used for Threading
@@ -163,7 +162,6 @@ class InternetArchiveDownloader:
         # Calculates new size of all the files in a given item
         item_size = 0
         for file in item.files:
-            pprint.pprint(file)
             item_size = item_size + int(file["size"])
 
         item.item_size = item_size
