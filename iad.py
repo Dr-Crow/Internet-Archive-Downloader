@@ -9,6 +9,7 @@ import os
 import time
 import hashlib
 import sys
+import pprint
 
 # Used for Threading
 import threading
@@ -144,8 +145,7 @@ class InternetArchiveDownloader:
         logger.info("Removed " + str(filtered_count) + " files from download list")
 
         # Need to update stats of filtered item
-        self._update_item_stats(item)
-        return item
+        return self._update_item_stats(item)
 
     @staticmethod
     def _update_item_stats(item):
@@ -162,6 +162,7 @@ class InternetArchiveDownloader:
         # Calculates new size of all the files in a given item
         item_size = 0
         for file in item.files:
+            pprint.pprint(file)
             item_size = item_size + int(file["size"])
 
         item.item_size = item_size
