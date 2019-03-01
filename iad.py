@@ -354,7 +354,8 @@ class InternetArchiveDownloader:
         end_time = time.perf_counter()
         logger.info("Downloaded " + str(self.file_count) + " in " + str(end_time - start_time) + "secs")
 
-    def main(self, args):
+    @staticmethod
+    def main(args):
         download = InternetArchiveDownloader(args[0])
         download.run()
 
