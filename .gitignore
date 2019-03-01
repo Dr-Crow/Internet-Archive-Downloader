@@ -1,3 +1,5 @@
 ia.ini
 .idea/
 venv/
+*.log
+.ia

@@ -201,12 +201,18 @@ class InternetArchiveDownloader:
 
         start_time = time.perf_counter()
         total_retries = 0
-
         max_retries = self.max_retries
+        file_path = self.download_path + item.identifier + "/" + file["name"]
+
+        # Spawns monitor thread to print out percentages of download
+        monitor_thread = threading.Thread(target=self._monitor_download,
+                                          kwargs={"file_path": file_path, "total_size": file["size"]})
+
         # Loop keep trying to download file
-        while max_retries != 0:
+        while max_retries != 0 or total_retries == 0:
             try:
-                File(item, file["name"]).download(file_path=self.download_path + item.identifier + "/" + file["name"])
+                monitor_thread.start()
+                File(item, file["name"]).download(file_path=file_path)
                 break
             except requests.exceptions.ConnectionError as error:
                 logger.error(error)
@@ -219,7 +225,7 @@ class InternetArchiveDownloader:
 
         logger.info(file["name"] + " successfully downloaded!\n" +
                     "Download left for " + item.identifier + ": " + size(self.download_left[item.identifier]) + "\n"
-                    "Files Left to go: " + str(len(self.queue)))
+                    "Files Left to go: " + str(self.queue.qsize()))
 
         logger.debug(file["name"] + " Download Stats:\n" +
                      "Total Retries: " + str(total_retries) + "\n" +
@@ -321,6 +327,28 @@ class InternetArchiveDownloader:
 
         # Activates the thread
         t.start()
+
+    def _monitor_download(self, file_path=None, total_size=None):
+        current_size = 0
+        try:
+            current_size = os.path.getsize(file_path)
+        except FileNotFoundError:
+            logger.error(file_path + " not found yet!")
+
+        while current_size != total_size:
+            logger.info("Download Progress( " + size(total_size) + "): " +
+                        str(self.percentage(current_size, total_size)) + "%")
+            try:
+                current_size = os.path.getsize(file_path)
+            except FileNotFoundError:
+                logger.error(file_path + " not found yet!")
+
+        logger.debug("Killing Thread?")
+        sys.exit(0)
+
+    @staticmethod
+    def percentage(part, whole):
+        return 100 * float(part) / float(whole)
 
     def run(self):
         # Creates timer to see how long the program takes
