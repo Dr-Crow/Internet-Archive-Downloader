@@ -58,8 +58,10 @@ class InternetArchiveDownloader:
         with open(config_file, 'r') as stream:
             try:
                 data = yaml.load(stream)
-            except yaml.YAMLError:
-                logger.error(yaml.YAMLError)
+            except yaml.YAMLError as exc:
+                if hasattr(exc, 'problem_mark'):
+                    mark = exc.problem_mark
+                    print("Error position: (%s:%s)" % (mark.line + 1, mark.column + 1))
                 exit(1)
 
         # Set the passed in vars to the class vars
@@ -75,7 +77,7 @@ class InternetArchiveDownloader:
             self.file_integrity_type = iad_config["file_integrity_type"]
             logging.config.dictConfig(data["logging"])
         except KeyError as error:
-            logger.error(error)
+            print(error)
             raise
 
         # Initialize Queue
