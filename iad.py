@@ -100,7 +100,7 @@ class InternetArchiveDownloader:
         """
 
         item = self.session.get_item(identifier)
-        if item.exist:
+        if item.exists:
             return item
         else:
             logger.error(identifier + " could not be found!")
@@ -137,7 +137,7 @@ class InternetArchiveDownloader:
                     logger.info("Removed " + file["name"] + " for file integrity issues, forcing fresh download!")
             # Checks if the file extension is on the exclusion list
             elif extension in self.file_extension_exclusion:
-                item.files.remove(files)
+                item.files.remove(file)
                 filtered_count = filtered_count + 1
                 logger.debug("Removed " + file["name"] + " because it's file extension was excluded.")
 
@@ -233,6 +233,7 @@ class InternetArchiveDownloader:
         """
         if os.path.isdir(self.download_path + identifier) is not True:
             os.mkdir(self.download_path + identifier)
+            logger.info("Created " + self.download_path + identifier + " folder!")
 
     @staticmethod
     def _hash_bytestr_iter(bytesiter, hasher, ashexstr=False):
@@ -333,8 +334,8 @@ class InternetArchiveDownloader:
         for identifier in self.identifiers:
             item = self._get_item(identifier)
             if item:
-                item = self._filter_files(item)
                 self._check_identifier_folder(identifier)
+                item = self._filter_files(item)
                 items.append(item)
 
         # Creates the download left dictionary
@@ -358,7 +359,7 @@ class InternetArchiveDownloader:
 
 
 def main(args):
-    download = InternetArchiveDownloader(args[0])
+    download = InternetArchiveDownloader(args[1])
     download.run()
 
 
