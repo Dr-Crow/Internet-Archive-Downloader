@@ -10,6 +10,7 @@ import time
 import hashlib
 import sys
 import pprint
+import copy
 
 # Used for Threading
 import threading
@@ -115,7 +116,7 @@ class InternetArchiveDownloader:
         """
 
         # Making a copy of the list of files because you can not remove a element while iterating over the list
-        files = item.files
+        files = copy.deepcopy(item.files)
 
         # Declares a var to hold filtered number of files for logging
         filtered_count = 0
