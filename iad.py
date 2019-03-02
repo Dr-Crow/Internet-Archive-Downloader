@@ -279,19 +279,20 @@ class InternetArchiveDownloader:
         :return: True if file is not corrupt
         """
         if method.lower() == "size":
+            logger.debug("IA File Size: " + file["size"] + " File Size: " + str(os.path.getsize(file_path)))
             if os.path.getsize(file_path) == int(file["size"]):
                 return True
             else:
                 return False
         elif method.lower() == "md5":
-            md5_hash = InternetArchiveDownloader._hash_bytestr_iter(InternetArchiveDownloader._file_as_blockiter(open(file_path, 'rb')), hashlib.md5())
+            md5_hash = InternetArchiveDownloader._hash_bytestr_iter(InternetArchiveDownloader._file_as_blockiter(open(file_path, 'rb')), hashlib.md5(), True)
             logger.debug("IA File MD5 Hash: " + file["md5"] + " File MD5 Hash: " + md5_hash)
             if md5_hash == file["md5"]:
                 return True
             else:
                 return False
         elif method.lower() == "sha1":
-            sha1_hash = InternetArchiveDownloader._hash_bytestr_iter(InternetArchiveDownloader._file_as_blockiter(open(file_path, 'rb')), hashlib.sha1())
+            sha1_hash = InternetArchiveDownloader._hash_bytestr_iter(InternetArchiveDownloader._file_as_blockiter(open(file_path, 'rb')), hashlib.sha1(), True)
             logger.debug("IA File SHA1 Hash: " + file["sha1"] + " File SHA1 Hash: " + sha1_hash)
             if sha1_hash == file["sha1"]:
                 return True
