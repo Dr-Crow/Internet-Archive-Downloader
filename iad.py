@@ -338,6 +338,7 @@ class InternetArchiveDownloader:
         while current_size != total_size:
             logger.info("Download Progress( " + size(int(total_size)) + "): " +
                         str(self.percentage(current_size, int(total_size))) + "%")
+            time.sleep(25)
             try:
                 current_size = os.path.getsize(file_path)
             except FileNotFoundError:
