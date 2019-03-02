@@ -209,11 +209,11 @@ class InternetArchiveDownloader:
         # Spawns monitor thread to print out percentages of download
         monitor_thread = threading.Thread(target=self._monitor_download,
                                           kwargs={"file_path": file_path, "total_size": file["size"]})
+        monitor_thread.start()
 
         # Loop keep trying to download file
         while max_retries != 0 or total_retries == 0:
             try:
-                monitor_thread.start()
                 File(item, file["name"]).download(file_path=file_path)
                 break
             except requests.exceptions.ConnectionError as error:
@@ -279,18 +279,20 @@ class InternetArchiveDownloader:
         :return: True if file is not corrupt
         """
         if method.lower() == "size":
-            if os.path.getsize(file_path) == file["size"]:
+            if os.path.getsize(file_path) == int(file["size"]):
                 return True
             else:
                 return False
         elif method.lower() == "md5":
             md5_hash = InternetArchiveDownloader._hash_bytestr_iter(InternetArchiveDownloader._file_as_blockiter(open(file_path, 'rb')), hashlib.md5())
+            logger.debug("IA File MD5 Hash: " + file["md5"] + " File MD5 Hash: " + md5_hash)
             if md5_hash == file["md5"]:
                 return True
             else:
                 return False
         elif method.lower() == "sha1":
             sha1_hash = InternetArchiveDownloader._hash_bytestr_iter(InternetArchiveDownloader._file_as_blockiter(open(file_path, 'rb')), hashlib.sha1())
+            logger.debug("IA File SHA1 Hash: " + file["sha1"] + " File SHA1 Hash: " + sha1_hash)
             if sha1_hash == file["sha1"]:
                 return True
             else:
@@ -331,6 +333,7 @@ class InternetArchiveDownloader:
         t.start()
 
     def _monitor_download(self, file_path=None, total_size=None):
+        total_size = int(total_size)
         current_size = 0
         try:
             current_size = os.path.getsize(file_path)
@@ -338,9 +341,10 @@ class InternetArchiveDownloader:
             logger.error(file_path + " not found yet!")
 
         while current_size != total_size:
-            logger.info("Download Progress( " + size(int(total_size)) + "): " +
-                        str(self.percentage(current_size, int(total_size))) + "%")
-            time.sleep(25)
+            logger.info("TOTAL SIZE: " + total_size + " Current Size: " + str(current_size))
+            logger.info("Download Progress(" + size(total_size) + "): " +
+                        str(self.percentage(current_size, total_size)) + "%")
+            time.sleep(self.percentage_sleep)
             try:
                 current_size = os.path.getsize(file_path)
             except FileNotFoundError:

@@ -10,8 +10,8 @@ iad:
   max_retries: -1
   ia_ini_path: "/home/ia.ini"
   skip_duplicate_files: True
-  file_integrity_type: "md5"
-  percentage_sleep: 25
+  file_integrity_type: "size"
+  percentage_sleep: 240
 logging:
     version: 1
     disable_existing_loggers: False
