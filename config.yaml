@@ -11,6 +11,7 @@ iad:
   ia_ini_path: "/home/ia.ini"
   skip_duplicate_files: True
   file_integrity_type: "md5"
+  percentage_sleep: 25
 logging:
     version: 1
     disable_existing_loggers: False

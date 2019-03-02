@@ -41,6 +41,7 @@ class InternetArchiveDownloader:
         self.ia_ini_path = None
         self.skip_duplicate_files = None
         self.file_integrity_type = None
+        self.percentage_sleep = None
 
         self.download_left = {}
         self.session = None
@@ -76,6 +77,7 @@ class InternetArchiveDownloader:
             self.ia_ini_path = iad_config["ia_ini_path"]
             self.skip_duplicate_files = iad_config["skip_duplicate_files"]
             self.file_integrity_type = iad_config["file_integrity_type"]
+            self.percentage_sleep = iad_config["percentage_sleep"]
             logging.config.dictConfig(data["logging"])
         except KeyError as error:
             print(error)
