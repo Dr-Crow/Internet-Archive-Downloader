@@ -174,7 +174,7 @@ class InternetArchiveDownloader:
             item_size = item_size + int(file["size"])
 
         item.item_size = item_size
-        LOGGER.debug("{identifier} should be at {size} size".format(identifier=item.identifier, size=item.item_size))
+        LOGGER.debug("{identifier} should be at {size}".format(identifier=item.identifier, size=size(item.item_size)))
 
         LOGGER.info("Updated stats of {identifier}".format(identifier=item.identifier))
         return item
