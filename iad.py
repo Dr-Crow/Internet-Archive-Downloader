@@ -4,6 +4,7 @@ import hashlib
 import sys
 import copy
 import threading
+import datetime
 import logging
 from logging import config
 from queue import Queue
@@ -217,7 +218,8 @@ class InternetArchiveDownloader:
 
         # Spawns monitor thread to print out percentages of download
         monitor_thread = threading.Thread(target=self._monitor_download,
-                                          kwargs={"file_path": file_path, "total_size": file["size"]})
+                                          kwargs={"file_path": file_path, "total_size": file["size"],
+                                                  "file_name": file["name"]})
         monitor_thread.start()
 
         # Loop keep trying to download file
@@ -244,10 +246,10 @@ class InternetArchiveDownloader:
 
         LOGGER.debug("{name} Download Stats:".format(name=file["name"]))
         LOGGER.debug("Total Retries: {retries}".format(retries=total_retries))
-        LOGGER.debug("Time: {seconds}secs".format(seconds=(end_time - start_time)))
+        LOGGER.debug("Time: {seconds}".format(seconds=datetime.timedelta(seconds=(end_time - start_time))))
         LOGGER.debug("Average Speed: {speed}/s".format(speed=(size(int(file["size"]) / (end_time - start_time)))))
-        LOGGER.debug("Estimated Time left: {time} secs".
-                     format(time=((self.download_left[item.identifier])/(int(file["size"]) / (end_time - start_time)))))
+        LOGGER.debug("Estimated Time left: {time}".format(time=self._get_estimated_time_left(
+            self.download_left[item.identifier], (int(file["size"]) / (end_time - start_time)))))
 
     def _check_identifier_folder(self, identifier):
         """
@@ -347,7 +349,7 @@ class InternetArchiveDownloader:
         # Activates the thread
         thread.start()
 
-    def _monitor_download(self, file_path=None, total_size=None):
+    def _monitor_download(self, file_path=None, total_size=None, file_name=None):
         """
         Monitors the download progress of a file
         :param file_path: Path of the file to be monitored
@@ -366,10 +368,9 @@ class InternetArchiveDownloader:
             LOGGER.error("{file_path} not found yet!".format(file_path=file_path))
 
         while current_size != total_size:
-            LOGGER.debug("Total Size: {total_size} Current Size: {current_size}".
-                         format(total_size=total_size, current_size=current_size))
-            LOGGER.info("Download Progress({total_size}): {percentage}%".
-                        format(total_size=total_size, percentage=self.percentage(current_size, total_size)))
+            LOGGER.info("Download Progress({total_size}) for {name}: {percentage}%".
+                        format(total_size=size(total_size), name=file_name,
+                               percentage=self.percentage(current_size, total_size)))
 
             # Sleep as to not spam the log file
             time.sleep(self.percentage_sleep)
@@ -390,6 +391,13 @@ class InternetArchiveDownloader:
         :return: Percentage
         """
         return 100 * float(part) / float(whole)
+
+    @staticmethod
+    def _get_estimated_time_left(download_left, speed):
+        time_left = download_left/speed
+        current_time = datetime.datetime.now().timestamp()
+
+        return datetime.datetime.fromtimestamp(time_left + current_time).strftime("%m/%d/%Y %H:%M:%S")
 
     def run(self):
         """
